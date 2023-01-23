@@ -28,4 +28,36 @@
 # Assign 4 random cards from deck to every player
 # Uncover 4 random cards
 
+import random
+
+decknormal = 8*[0,1,2,3,4,5,6,7,8] + 9*[9]
+deckspecial = 9*['Trade'] + 7*['Spy'] + 5*['Draw Twice']
+decknormal.sort()
+deck = decknormal + deckspecial
+
+class Player:
+    def __init__(self, name, cards=[None, None, None, None], score=None):
+        self.name = name
+        self.cards = cards
+        self.score = score
+
+    def draw_card(self):
+        pass
+
+Lars = Player('Lars Boertjes')
+
+# Assign Players
+num_of_players = int(input('Enter the number of players (2-4) for this game of Beverbende: '))
+
+if num_of_players < 2 or num_of_players > 4:
+    print('Enter a number between 2 and 4')
+
+name = input('Enter the name you want to play with: ')
+
+player = Player(name, [deck[random.randint(0, len(deck))] for value in range(4)])
+
+
+# Print player.cards
+print(player.name)
+print(player.cards)
 
