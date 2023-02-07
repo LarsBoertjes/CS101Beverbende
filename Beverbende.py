@@ -1,6 +1,6 @@
 # Beverbende CS101 Portfolio Project
 
-# let's you play single player Beverbende against 2 or more Computer Players
+# let's you play single player Beverbende against 1-4 Computer Players
 # You will see 4 uncovered values on your screen which represent your cards with a value
 # (first make it while you see the cards, later make it hidden)
 # You will see the 2 outside cards for a very brief moment
@@ -28,12 +28,63 @@
 # Assign 4 random cards from deck to every player
 # Uncover 4 random cards
 
+# Additional: how will we make this cpu 'good'?
+
 import random
 
-decknormal = 8*[0,1,2,3,4,5,6,7,8] + 9*[9]
-deckspecial = 9*['Trade'] + 7*['Spy'] + 5*['Draw Twice']
-decknormal.sort()
-deck = decknormal + deckspecial
+class Node:
+    def __init__(self, value, next_node=None):
+        self.value = value
+        self.next_node = next_node
+
+    def set_next_node(self, next_node):
+        self.next_node = next_node
+
+    def get_link_node(self):
+        return self.link_node
+
+    def get_value(self):
+        return self.value
+
+class Stack:
+  def __init__(self, name, limit=1000):
+    self.top_item = None
+    self.size = 0
+    self.limit = limit
+    self.name = name
+  
+  def get_name(self):
+    return self.name
+
+  def push(self, value):
+    if self.has_space():
+      item = Node(value)
+      item.set_next_node(self.top_item)
+      self.top_item = item
+      self.size += 1
+      print("Adding {} to the pizza stack!".format(value))
+    else:
+      print("No room for {}!".format(value))
+
+  def pop(self):
+    if not self.is_empty():
+      item_to_remove = self.top_item
+      self.top_item = item_to_remove.get_next_node()
+      self.size -= 1
+      print("Delivering " + item_to_remove.get_value())
+      return item_to_remove.get_value()
+    print("All out of pizza.")
+
+  def peek(self):
+    if not self.is_empty():
+      return self.top_item.get_value()
+    print("Nothing to see here!")
+
+  def has_space(self):
+    return self.limit > self.size
+
+  def is_empty(self):
+    return self.size == 0
 
 class Player:
     def __init__(self, name, cards=[None, None, None, None], score=None):
@@ -44,20 +95,43 @@ class Player:
     def draw_card(self):
         pass
 
-Lars = Player('Lars Boertjes')
+    def trade(self):
+        pass
+
+    def see_score(self):
+        pass
+
+decknormal = 8*[0,1,2,3,4,5,6,7,8] + 9*[9]
+deckspecial = 9*['Trade'] + 7*['Spy'] + 5*['Draw Twice']
+decknormal.sort()
+deck = decknormal + deckspecial
+
+players = {}
+uncovered = Stack('Uncovered', limit=len(deck))
+covered = Stack('Covered', limit=len(deck))
+
+for i in range(len(deck)):
+    random_card = random.choice(deck)
+    covered.push(random_card)    
+    deck.remove(random_card)
+
+print(deck)
+print(covered.peek())
 
 # Assign Players
-num_of_players = int(input('Enter the number of players (2-4) for this game of Beverbende: '))
-
-if num_of_players < 2 or num_of_players > 4:
-    print('Enter a number between 2 and 4')
+num_of_opp = int(input('Enter the number of opponents (1-4) for this game of Beverbende: '))
+if num_of_opp < 1 or num_of_opp > 4:
+    print('Enter a number between 1 and 4')
 
 name = input('Enter the name you want to play with: ')
 
-player = Player(name, [deck[random.randint(0, len(deck))] for value in range(4)])
+players[name] = Player(name)
 
 
-# Print player.cards
-print(player.name)
-print(player.cards)
+for number in range(1, num_of_opp + 1):
+    players['cpu' + str(number)] = Player('Opponent ' + str(number))
 
+print(players)
+
+for player in players:
+    print(players[player].cards)
