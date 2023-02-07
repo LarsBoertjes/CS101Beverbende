@@ -62,7 +62,7 @@ class Stack:
       item.set_next_node(self.top_item)
       self.top_item = item
       self.size += 1
-      print("Adding {} to the pizza stack!".format(value))
+      print("Adding {} to the covered stack!".format(value))
     else:
       print("No room for {}!".format(value))
 
@@ -87,20 +87,39 @@ class Stack:
     return self.size == 0
 
 class Player:
-    def __init__(self, name, cards=[None, None, None, None], score=None):
-        self.name = name
-        self.cards = cards
-        self.score = score
+  def __init__(self, name, cards=[], score=None):
+    self.name = name
+    self.cards = cards
+    self.score = score
 
-    def draw_card(self):
-        pass
+  def give_start_cards(self):
+    new_cards = []
+    
+    for i in range(4):
+      random_card = random.choice(deck)
+      new_cards.append(random_card)
+      deck.remove(random_card)
 
-    def trade(self):
-        pass
+    self.cards = new_cards
+  
+  def draw_card(self):
+    pass
 
-    def see_score(self):
-        pass
+  def trade(self):
+    pass
 
+  def score(self):
+    score = 0
+
+    for card in self.cards:
+      if type(card) == str:
+        score += 9
+      else:
+        score += int(card)
+    
+    return score
+
+# Creating the BeverBende Deck
 decknormal = 8*[0,1,2,3,4,5,6,7,8] + 9*[9]
 deckspecial = 9*['Trade'] + 7*['Spy'] + 5*['Draw Twice']
 decknormal.sort()
@@ -110,28 +129,54 @@ players = {}
 uncovered = Stack('Uncovered', limit=len(deck))
 covered = Stack('Covered', limit=len(deck))
 
-for i in range(len(deck)):
-    random_card = random.choice(deck)
-    covered.push(random_card)    
-    deck.remove(random_card)
-
-print(deck)
-print(covered.peek())
-
-# Assign Players
+# Enter number of Opponents
 num_of_opp = int(input('Enter the number of opponents (1-4) for this game of Beverbende: '))
-if num_of_opp < 1 or num_of_opp > 4:
-    print('Enter a number between 1 and 4')
-
+while num_of_opp < 1 or num_of_opp > 4:
+    num_of_opp = int(input('Enter a number between 1 and 4: '))
+    
+# Creating the Player
 name = input('Enter the name you want to play with: ')
+player = Player(name)
+players[player.name] = player
 
-players[name] = Player(name)
+# Creating the oponents and adding them to Players dictionary
+if num_of_opp == 1:
+  cpu1 = Player('Opponent 1')
+  players[cpu1.name] = cpu1
+elif num_of_opp == 2:
+  cpu1 = Player('Opponent 1')
+  players[cpu1.name] = cpu1
+  cpu2 = Player('Opponent 2')
+  players[cpu2.name] = cpu2
+elif num_of_opp == 3:
+  cpu1 = Player('Opponent 1')
+  players[cpu1.name] = cpu1
+  cpu2 = Player('Opponent 2')
+  players[cpu2.name] = cpu2
+  cpu3 = Player('Opponent 3')
+  players[cpu3.name] = cpu3
+else:
+  cpu1 = Player('Opponent 1')
+  players[cpu1.name] = cpu1
+  cpu2 = Player('Opponent 2')
+  players[cpu2.name] = cpu2
+  cpu3 = Player('Opponent 3')
+  players[cpu3.name] = cpu3
+  cpu4 = Player('Opponent 4')
+  players[cpu4.name] = cpu4
 
 
-for number in range(1, num_of_opp + 1):
-    players['cpu' + str(number)] = Player('Opponent ' + str(number))
+# Giving each Player 4 random cards from deck
+for player in players:
+  players[player].give_start_cards()
+  
 
-print(players)
+# Create covered and uncovered stack and push remainder of deck on covered
+for i in range(len(deck)):
+  random_card = random.choice(deck)
+  covered.push(random_card)
+  deck.remove(random_card)
 
 for player in players:
-    print(players[player].cards)
+  print("{} has the following cards: {}, with a score of {} .".format(players[player].name, players[player].cards, players[player].score))
+
