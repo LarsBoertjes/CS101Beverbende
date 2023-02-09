@@ -40,8 +40,8 @@ class Node:
     def set_next_node(self, next_node):
         self.next_node = next_node
 
-    def get_link_node(self):
-        return self.link_node
+    def get_next_node(self):
+        return self.next_node
 
     def get_value(self):
         return self.value
@@ -62,7 +62,7 @@ class Stack:
       item.set_next_node(self.top_item)
       self.top_item = item
       self.size += 1
-      print("Adding {} to the covered stack!".format(value))
+      print("Adding {} to the stack!".format(value))
     else:
       print("No room for {}!".format(value))
 
@@ -71,14 +71,15 @@ class Stack:
       item_to_remove = self.top_item
       self.top_item = item_to_remove.get_next_node()
       self.size -= 1
-      print("Delivering " + item_to_remove.get_value())
+      print("Your card is " + str(item_to_remove.get_value()))
       return item_to_remove.get_value()
-    print("All out of pizza.")
+    print("No more cards")
 
   def peek(self):
     if not self.is_empty():
       return self.top_item.get_value()
-    print("Nothing to see here!")
+    else:
+      return 'empty'
 
   def has_space(self):
     return self.limit > self.size
@@ -108,22 +109,13 @@ class Player:
   def trade(self):
     pass
 
-  def score(self):
-    score = 0
-
-    for card in self.cards:
-      if type(card) == str:
-        score += 9
-      else:
-        score += int(card)
-    
-    return score
 
 # Creating the BeverBende Deck
 decknormal = 8*[0,1,2,3,4,5,6,7,8] + 9*[9]
 deckspecial = 9*['Trade'] + 7*['Spy'] + 5*['Draw Twice']
 decknormal.sort()
 deck = decknormal + deckspecial
+round = 1
 
 players = {}
 uncovered = Stack('Uncovered', limit=len(deck))
@@ -136,8 +128,10 @@ while num_of_opp < 1 or num_of_opp > 4:
     
 # Creating the Player
 name = input('Enter the name you want to play with: ')
-player = Player(name)
-players[player.name] = player
+human_player = Player(name)
+players[human_player.name] = human_player
+
+print(human_player.cards)
 
 # Creating the oponents and adding them to Players dictionary
 if num_of_opp == 1:
@@ -177,6 +171,109 @@ for i in range(len(deck)):
   covered.push(random_card)
   deck.remove(random_card)
 
+# Calculate scores
+def calculate_score(player):
+  score = 0
+
+  for card in player.cards:
+    if type(card) == str:
+      score += 9
+    else:
+      score += card
+  
+  return score
+
+# Show Cards and Scores of every player
 for player in players:
-  print("{} has the following cards: {}, with a score of {} .".format(players[player].name, players[player].cards, players[player].score))
+  print("{} has the following cards: {}, with a score of {} .".format(players[player].name, players[player].cards, calculate_score(players[player])))
+
+print(human_player.cards)
+
+
+# Show Player two outside cards and ask for imput
+print('Round {} will now start'.format(round))
+print('==================================')
+print('Uncovered Stack:' + str(uncovered.peek()) + ' Covered Stack: ###')
+stack_choice = input('Would you like to draw from the covered (C) stack or pick the last played card (U)? ')
+while stack_choice != 'C' and stack_choice != 'U':
+  stack_choice = input('Please enter C for covered or U for last played card: ')
+if uncovered.size == 0:
+  print('The uncovered stack is empty, so you have to pick from the covered stack')
+  stack_choice = 'C'
+
+if stack_choice == 'C':
+  new_card = covered.pop()
+
+  # Would you like to use your new card or pass it onto the uncovered stack?
+  card_choice = input('Would you like to use (U) your new card or pass (P) it onto the uncovered stack? ')
+  while card_choice != 'U' and card_choice != 'P':
+    card_choice = input('Please enter (U) to use your card or (P) to pass it on: ')
+    
+  if card_choice == 'P':
+    print('Passing your card onto the uncovered stack')
+    uncovered.push(new_card)
+    print(uncovered.peek())
+  else:
+    if type(new_card) == str:
+      print('special card')
+      if new_card == 'Trade':
+        pass
+        # Print opponents to trade from
+
+        # Print cards of opponent picked
+
+        # Trade cards
+      elif new_card == 'Spy':
+        # Print player cards
+
+        # Pick card you want to see
+
+        # Print card you want to see
+        pass
+      elif new_card == 'Draw Twice':
+        # turn(player) again
+        # turn(player) again
+                
+        pass
+        
+        
+
+    else:
+      print('normal card')
+      trade_choice = int(input('Which card from {} would you like to trade with? Enter 1, 2, 3 or 4: '.format(human_player.cards)))
+      if trade_choice == 1:
+        print('You will trade with {}'.format(human_player.cards[0]))
+        uncovered.push(human_player.cards[0])
+        human_player.cards[0] = new_card
+      elif trade_choice == 2:
+        print('You will trade with {}'.format(human_player.cards[1]))
+        uncovered.push(human_player.cards[1])
+        human_player.cards[1] = new_card
+      elif trade_choice == 3:
+        print('You will trade with {}'.format(human_player.cards[2]))
+        uncovered.push(human_player.cards[2])
+        human_player.cards[2] = new_card
+      elif trade_choice == 4:
+        print('You will trade with {}'.format(human_player.cards[3]))
+        uncovered.push(human_player.cards[3])
+        human_player.cards[3] = new_card
+      print('Your cards are now: ' + str(human_player.cards))
+
+
+if stack_choice == 'U':
+  if uncovered.size == 0:
+    print('Sorry this stack is empty!')
+  else:
+    new_card = uncovered.pop()
+
+
+
+
+
+
+
+
+
+
+
 
